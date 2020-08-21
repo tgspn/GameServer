@@ -55,7 +55,7 @@ dotnet run
 
 > **Atenção**
 >
-> Quando deixar de utilizar o banco de dados em memoria, é necessário realizar a [migração][6] antes de executar o projeto.
+> Quando deixar de utilizar o banco de dados padrão, é necessário realizar a [migração][6] antes de executar o projeto.
 
 ---
 ## Configuração
