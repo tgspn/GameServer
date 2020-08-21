@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,10 +17,9 @@ namespace GameServer.Controllers
     {
         private readonly ILogger<GameController> logger;
         GameService service;
-        public GameController(IConfiguration configuration, ILogger<GameController> logger)
-        {
-            var persistenceTime = string.IsNullOrEmpty(configuration["persistenceTime"]) ? TimeSpan.FromMinutes(10) : TimeSpan.Parse(configuration["persistenceTime"]);
-            this.service = new GameService(persistenceTime);
+        public GameController( ILogger<GameController> logger)
+        {            
+            this.service = new GameService();
             this.logger = logger;
         }
 

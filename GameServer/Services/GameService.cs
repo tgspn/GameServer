@@ -1,4 +1,4 @@
-﻿using GameServer.BD;
+using GameServer.BD;
 using GameServer.Models;
 using Microsoft.Extensions.Logging;
 using System;
@@ -11,40 +11,17 @@ namespace GameServer.Services
 {
     public class GameService
     {
-        private readonly ConcurrentDictionary<Guid, GameResultModel> memoryDb;
-        private readonly Timer persistenceTimer;
+        private readonly ConcurrentBag<GameResultModel> memoryDb;
 
-        public GameService(TimeSpan periodicSave)
+        public GameService()
         {
-            this.memoryDb = GameMemoryDB.Instance.DataBase;
-            this.persistenceTimer = new Timer()
-            {
-                Interval = periodicSave.TotalMilliseconds,
-                Enabled = true
-            };
-
-            persistenceTimer.Elapsed += PersistenceTimer_Elapsed;
-            persistenceTimer.Start();
-
-
-            LoadFromBd();
+            this.memoryDb = GameMemoryDB.Instance.DataBase;           
         }
-
-        private void PersistenceTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-
-        }
-        private void LoadFromBd()
-        {
-
-        }
+                  
 
         public void Save(GameResultModel model)
         {
-            if (model.Id == default(Guid))
-                model.Id = Guid.NewGuid();
-
-            memoryDb[model.Id] = model;
+            memoryDb.Add(model);
         }
     }
 }

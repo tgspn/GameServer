@@ -1,4 +1,4 @@
-﻿using GameServer.BD;
+using GameServer.BD;
 using GameServer.Models;
 using Microsoft.Extensions.Logging;
 using System;
@@ -14,7 +14,7 @@ namespace GameServer.Services
 {
     public class LeaderboardService
     {
-        private readonly ConcurrentDictionary<Guid, GameResultModel> memoryDb;
+        private readonly ConcurrentBag<GameResultModel> memoryDb;
         private readonly Timer leaderBoardTimer;
         private readonly ConcurrentDictionary<long, ImmutableList<LeaderboardViewModel>> leaderboards;
         private readonly object lockObject = new object();
@@ -63,7 +63,7 @@ namespace GameServer.Services
             {
                 leaderBoardTimer.Enabled = false;
 
-                var memoryDbSnap = memoryDb.Values.ToImmutableList();
+                var memoryDbSnap = memoryDb.ToImmutableList();
 
                 memoryDbSnap
                     .AsParallel()
@@ -74,10 +74,15 @@ namespace GameServer.Services
                         var newLeaderboard = GenerateLeadeboard(memoryDbSnap, gameId);
                         if (!leaderboards.ContainsKey(gameId))
                         {
-                            while (!leaderboards.TryAdd(gameId, newLeaderboard.ToImmutableList()))
+                            if (!leaderboards.TryAdd(gameId, newLeaderboard.ToImmutableList()))
                             {
-                                Console.WriteLine("try add item");
+                                if (leaderboards.ContainsKey(gameId))
+                                {
+                                    leaderboards[gameId].Clear();
+                                    leaderboards[gameId]= newLeaderboard.ToImmutableList();
+                                }
                             }
+                            
                         }
                         else
                         {
@@ -86,7 +91,7 @@ namespace GameServer.Services
                         }
                     });
             }
-            catch (Exception ex)
+            catch
             {
                Console.WriteLine("error on update leaderboard");
             }
