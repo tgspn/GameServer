@@ -97,6 +97,24 @@ No Console
 ```dotnetcli
 dotnet ef database update
 ```
+---
+## Docker
+
+O Sistema conta com um [Dockerfile][8] para facilitar o *deploy* da aplicação.
+
+### Construir a imagem
+
+```bash
+docker build GameServer --tag gameserver:latest
+```
+
+### Executar
+```bash
+docker run -p 5000:80 -p 5001:443 --name server -d gameserver
+```
+## Documentação da API
+O Projeto conta com uma documentação de API, para mais detalhes execute o projeto e acesso o seguinte caminho [http://localhost:5000/][9]
+
 
 [0]: #configuração
 [1]: https://dotnet.microsoft.com/download
@@ -106,3 +124,5 @@ dotnet ef database update
 [5]: ./GameServer/appsettings.json
 [6]: #migração
 [7]: https://docs.microsoft.com/pt-br/ef/core/providers/?tabs=dotnet-core-cli
+[8]: ./GameServer/Dockerfile
+[9]:http://localhost:5000/
