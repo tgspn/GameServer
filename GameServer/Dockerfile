@@ -7,7 +7,7 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
-COPY ["GameServer/GameServer.csproj", "GameServer/"]
+COPY [".", "GameServer/"]
 RUN dotnet restore "GameServer/GameServer.csproj"
 COPY . .
 WORKDIR "/src/GameServer"
