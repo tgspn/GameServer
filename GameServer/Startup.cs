@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using GameServer.BD;
 using GameServer.Services;
@@ -12,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 
 namespace GameServer
 {
@@ -32,6 +35,13 @@ namespace GameServer
             Console.WriteLine("Setup MemoryDB");
             GameMemoryDB.Instance.SetPersistenceInterval(GetPersistenceTime());
             services.AddControllers();
+
+            services.AddSwaggerGen(options=>
+            {
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                options.IncludeXmlComments(xmlPath);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -41,6 +51,13 @@ namespace GameServer
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseSwagger();
+
+            app.UseSwaggerUI(option =>
+            {
+                option.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1");
+                option.RoutePrefix = string.Empty;
+            });
 
             app.UseHttpsRedirection();
 
