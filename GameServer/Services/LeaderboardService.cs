@@ -1,4 +1,4 @@
-using GameServer.BD;
+﻿using GameServer.BD;
 using GameServer.Models;
 using Microsoft.Extensions.Logging;
 using System;
@@ -17,12 +17,10 @@ namespace GameServer.Services
         private readonly ConcurrentBag<GameResultModel> memoryDb;
         private readonly Timer leaderBoardTimer;
         private readonly ConcurrentDictionary<long, ImmutableList<LeaderboardViewModel>> leaderboards;
-        private readonly object lockObject = new object();
-        private static readonly object lockInstanceObject = new object();
-        private static LeaderboardService instance;
 
         private LeaderboardService()
         {
+            Console.WriteLine("leaderboard");
             this.memoryDb = GameMemoryDB.Instance.DataBase;
             this.leaderBoardTimer = new Timer()
             {
@@ -42,20 +40,7 @@ namespace GameServer.Services
         {
             leaderBoardTimer.Start();
         }
-        public static LeaderboardService Instance
-        {
-            get
-            {
-                lock (lockInstanceObject)
-                {
-                    if (instance is null)
-                    {
-                        instance = new LeaderboardService();
-                    }
-                }
-                return instance;
-            }
-        }
+        public static LeaderboardService Instance { get; } = new LeaderboardService();
         public IEnumerable<LeaderboardViewModel> this[long gameId] { get => leaderboards[gameId]; }
         private void LeaderBoardTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
