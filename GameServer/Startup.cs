@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GameServer.BD;
 using GameServer.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -26,6 +27,10 @@ namespace GameServer
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            Console.WriteLine("Setup Database");
+            ApplicationDbContext.SetConfiguration(GetDatabaseType(), Configuration.GetConnectionString(nameof(ApplicationDbContext)));
+            Console.WriteLine("Setup MemoryDB");
+            GameMemoryDB.Instance.SetPersistenceInterval(GetPersistenceTime());
             services.AddControllers();
         }
 
@@ -48,6 +53,14 @@ namespace GameServer
                 endpoints.MapControllers();
             });
             LeaderboardService.Instance.Start();
+        }
+        private DatabaseType GetDatabaseType()
+        {
+            return Enum.TryParse<DatabaseType>(Configuration["databaseType"], out var type) ? type : DatabaseType.Default;
+        }
+        private TimeSpan GetPersistenceTime()
+        {
+            return string.IsNullOrEmpty(Configuration["persistenceTime"]) ? TimeSpan.FromMinutes(10) : TimeSpan.Parse(Configuration["persistenceTime"]);
         }
     }
 }
